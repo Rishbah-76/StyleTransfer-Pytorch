@@ -3,7 +3,16 @@
 Transform your photos into artistic masterpieces using the power of AI! This web application implements Neural Style Transfer using PyTorch, allowing you to apply the artistic style of one image to the content of another.
 
 ## Demo Video
-<div style="position: relative; padding-bottom: 44.0625%; height: 0;"><iframe src="https://www.loom.com/embed/850abd53da9f43e2b18d2b6f784920fe?sid=1de48295-3eb4-432b-8815-260c427e4000" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>
+<div>
+    <a href="https://www.loom.com/share/850abd53da9f43e2b18d2b6f784920fe">
+      <p>AI Style Transfer | Transform Your Art - 31 May 2025 - Watch Video</p>
+    </a>
+    <a href="https://www.loom.com/share/850abd53da9f43e2b18d2b6f784920fe">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/850abd53da9f43e2b18d2b6f784920fe-7c00a21e783e0028-full-play.gif">
+    </a>
+  </div>
+
+
 
 ## Features ✨
 

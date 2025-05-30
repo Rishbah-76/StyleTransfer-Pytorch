@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Style Transfer | Transform Your Art</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .image-preview {
+            background: repeating-conic-gradient(#f3f4f6 0% 25%, transparent 0% 50%) 50% / 20px 20px;
+        }
+        @keyframes pulse {
+            50% { opacity: .5; }
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen" x-data="{ 
+    processing: false,
+    contentPreview: null,
+    stylePreview: null,
+    showResult: {{ 'true' if result else 'false' }},
+    previewImage(event, target) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (target === 'content') this.contentPreview = e.target.result;
+                else this.stylePreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+}">
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-3xl font-bold text-gray-900">AI Style Transfer</h1>
+            <p class="text-gray-600 mt-1">Transform your photos into artistic masterpieces</p>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <form action="/upload" method="post" enctype="multipart/form-data" 
+                  @submit="processing = true" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Content Image Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Content Image</label>
+                        <div class="relative">
+                            <div class="image-preview aspect-video rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden"
+                                 :class="{'border-indigo-500': contentPreview}">
+                                <template x-if="!contentPreview">
+                                    <div class="text-center p-6">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-1 text-sm text-gray-500">Upload your content image</p>
+                                    </div>
+                                </template>
+                                <template x-if="contentPreview">
+                                    <img :src="contentPreview" class="object-contain w-full h-full" />
+                                </template>
+                            </div>
+                            <input type="file" name="content_img" required
+                                   @change="previewImage($event, 'content')"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Style Image Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Style Image</label>
+                        <div class="relative">
+                            <div class="image-preview aspect-video rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden"
+                                 :class="{'border-indigo-500': stylePreview}">
+                                <template x-if="!stylePreview">
+                                    <div class="text-center p-6">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <p class="mt-1 text-sm text-gray-500">Upload your style image</p>
+                                    </div>
+                                </template>
+                                <template x-if="stylePreview">
+                                    <img :src="stylePreview" class="object-contain w-full h-full" />
+                                </template>
+                            </div>
+                            <input type="file" name="style_img" required
+                                   @change="previewImage($event, 'style')"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button type="submit" 
+                            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                            :disabled="processing">
+                        <template x-if="!processing">
+                            <span>Transform Image</span>
+                        </template>
+                        <template x-if="processing">
+                            <div class="flex items-center">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Processing...
+                            </div>
+                        </template>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        {% if result %}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Generated Artwork</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <h3 class="text-lg font-medium text-gray-900">Original Content</h3>
+                    <div class="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                        <img src="{{ content_path }}" class="w-full h-full object-contain" alt="Content Image">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-lg font-medium text-gray-900">Style Reference</h3>
+                    <div class="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                        <img src="{{ style_path }}" class="w-full h-full object-contain" alt="Style Image">
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-lg font-medium text-gray-900">Final Result</h3>
+                    <div class="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                        <img src="{{ output_path }}" class="w-full h-full object-contain" alt="Generated Image">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 text-center">
+                <a href="{{ output_path }}" download class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Download Result
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                Built with FastAPI, PyTorch, and TailwindCSS
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
